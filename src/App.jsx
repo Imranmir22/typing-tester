@@ -22,6 +22,8 @@ export default function TypingMaster() {
     const [errors, setErrors] = useState(0);
     const [correctChars, setCorrectChars] = useState(0);
     const [totalChars, setTotalChars] = useState(0);
+    const [customText, setCustomText] = useState("");
+    const [showCustomTextInput, setShowCustomTextInput] = useState(false);
     const inputRef = useRef(null);
     const audioContextRef = useRef(null);
 
@@ -90,6 +92,33 @@ export default function TypingMaster() {
         setCorrectChars(0);
         setTotalChars(0);
         setStartTime(0);
+        setShowCustomTextInput(false);
+    };
+
+    const handleCustomTextSubmit = () => {
+        if (customText.trim().length === 0) {
+            alert("Please enter some text!");
+            return;
+        }
+        const wordArray = customText.trim().split(/\s+/);
+        if (wordArray.length < 10) {
+            alert("Please enter at least 10 words!");
+            return;
+        }
+        setWords(wordArray);
+        setCurrentWordIndex(0);
+        setCurrentInput("");
+        setCompletedWords([]);
+        setStarted(false);
+        setFinished(false);
+        setTimeLeft(timeLimit);
+        setWpm(0);
+        setAccuracy(100);
+        setErrors(0);
+        setCorrectChars(0);
+        setTotalChars(0);
+        setStartTime(0);
+        setShowCustomTextInput(false);
     };
 
     const finishTest = () => {
@@ -256,13 +285,22 @@ export default function TypingMaster() {
                             <Trophy className="w-6 h-6 md:w-10 md:h-10" />
                             Typing Master
                         </h1>
-                        <button
-                            onClick={resetGame}
-                            className="flex items-center gap-1 md:gap-2 px-3 md:px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm md:text-base"
-                        >
-                            <RotateCcw className="w-4 h-4 md:w-5 md:h-5" />
-                            Reset
-                        </button>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setShowCustomTextInput(!showCustomTextInput)}
+                                className="flex items-center gap-1 md:gap-2 px-3 md:px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm md:text-base"
+                                disabled={started}
+                            >
+                                Custom Text
+                            </button>
+                            <button
+                                onClick={resetGame}
+                                className="flex items-center gap-1 md:gap-2 px-3 md:px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm md:text-base"
+                            >
+                                <RotateCcw className="w-4 h-4 md:w-5 md:h-5" />
+                                Reset
+                            </button>
+                        </div>
                     </div>
 
                     {/* Main Layout: Left Sidebar + Center Content */}
@@ -312,6 +350,39 @@ export default function TypingMaster() {
 
                         {/* Center Content - Typing Area */}
                         <div className="flex-1">
+                            {/* Custom Text Input */}
+                            {showCustomTextInput && !started && (
+                                <div className="mb-4 md:mb-6 bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-xl border-2 border-purple-300">
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                        Enter Your Custom Text:
+                                    </label>
+                                    <textarea
+                                        value={customText}
+                                        onChange={(e) => setCustomText(e.target.value)}
+                                        placeholder="Type or paste your custom paragraph here (minimum 10 words)..."
+                                        className="w-full p-3 text-base border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 resize-none mb-3"
+                                        rows="4"
+                                    />
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={handleCustomTextSubmit}
+                                            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold text-sm"
+                                        >
+                                            Use This Text
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setShowCustomTextInput(false);
+                                                setCustomText("");
+                                            }}
+                                            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors font-semibold text-sm"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
                             {/* Time Limit Selection */}
                             {!started && (
                                 <div className="mb-4 md:mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 p-3 md:p-4 rounded-xl border-2 border-purple-200">
